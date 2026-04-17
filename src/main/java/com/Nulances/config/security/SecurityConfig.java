@@ -75,7 +75,9 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "https://nulances-backend-production-509c.up.railway.app"
+                "https://nulances-backend-production-509c.up.railway.app",
+                "https://www.nulances.com",
+                "https://nulances.com"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
