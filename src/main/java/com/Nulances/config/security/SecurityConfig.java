@@ -75,7 +75,6 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "https://nulances-backend-production-509c.up.railway.app",
                 "https://www.nulances.com",
                 "https://nulances.com"
         ));
