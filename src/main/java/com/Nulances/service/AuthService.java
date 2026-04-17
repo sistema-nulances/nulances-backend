@@ -102,7 +102,7 @@ public class AuthService {
         if (!Boolean.TRUE.equals(usuario.getEmailVerificado())) {
             confirmacaoEmailService.gerarCodigoEEnfileirarEnvio(usuario);
             throw new EmailNaoVerificadoException(
-                    "Seu e-mail ainda não foi confirmado. Caso não exista um código válido pendente, um novo código foi enviado."
+                    "Seu e-mail ainda nao foi confirmado. Caso nao exista um codigo valido pendente, um novo código foi enviado."
             );
         }
 
