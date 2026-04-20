@@ -1,11 +1,7 @@
 package com.Nulances.domain.enums;
 
 public enum CondicaoAnuncioVeiculo {
-    CONSERVADO,
-    RECUPERAVEL,
-    SUCATA,
-    TRABALHO_PESADO,
-    OTIMO_ESTADO,
+    PEQUENA_MONTA,
     MEDIA_MONTA,
-    SINISTRADO
+    GRANDE_MONTA
 }
