@@ -1,7 +1,10 @@
 package com.Nulances.repository;
 
 import com.Nulances.domain.entity.Usuario;
+import com.Nulances.domain.enums.UserRole;
 import com.Nulances.dto.response.AdminMarketplaceVendedorAtivoProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -55,4 +58,23 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
     @EntityGraph(attributePaths = {"documentosValidacao", "documentosVendedor"})
     Optional<Usuario> findDetalhadoByEmail(String email);
+    Page<Usuario> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    Page<Usuario> findByNomeCompletoContainingIgnoreCaseOrEmailContainingIgnoreCaseOrderByCreatedAtDesc(
+            String nome,
+            String email,
+            Pageable pageable
+    );
+
+    Optional<Usuario> findByCpf(String cpf);
+
+    Optional<Usuario> findByTelefone(String telefone);
+
+    boolean existsByEmailAndIdNot(String email, UUID id);
+
+    boolean existsByCpfAndIdNot(String cpf, UUID id);
+
+    boolean existsByTelefoneAndIdNot(String telefone, UUID id);
+
+    long countByRole(UserRole role);
 }
