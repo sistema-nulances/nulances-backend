@@ -21,6 +21,7 @@ import com.Nulances.dto.response.AnuncioPublicoListResponse;
 import com.Nulances.dto.response.AnuncioResponse;
 import com.Nulances.dto.response.AnuncioVendedorListResponse;
 import com.Nulances.mapper.AnuncioMapper;
+import com.Nulances.payment.service.AssinaturaPlanoService;
 import com.Nulances.repository.AnuncioRepository;
 import com.Nulances.repository.MarcaRepository;
 import com.Nulances.repository.UsuarioRepository;
@@ -44,12 +45,16 @@ public class AnuncioService {
     private final MarcaRepository marcaRepository;
     private final UsuarioRepository usuarioRepository;
     private final AnuncioMapper anuncioMapper;
+    private final AssinaturaPlanoService assinaturaPlanoService;
 
     @PreAuthorize("hasAnyRole('VENDEDOR','ADMIN')")
     @Transactional
     public AnuncioResponse criar(CriarAnuncioRequest request, CustomUserDetails userDetails) {
         Usuario vendedor = buscarUsuarioAutenticado(userDetails);
         validarPermissaoVendedorOuAdmin(vendedor);
+        if (vendedor.getRole() == UserRole.VENDEDOR) {
+            assinaturaPlanoService.validarPodeCriarAnuncio(vendedor.getId());
+        }
 
         Marca marca = buscarMarca(request.getMarca());
 

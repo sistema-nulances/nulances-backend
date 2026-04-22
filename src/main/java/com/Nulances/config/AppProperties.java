@@ -11,6 +11,7 @@ public record AppProperties(
     public record Confirmacao(Integer expiracaoMinutos) {}
     public record Jms(
             String queueEmailConfirmacao,
-            String queueLanceRecebido
+            String queueLanceRecebido,
+            String queueCobrancaPlano
     ) {}
 }

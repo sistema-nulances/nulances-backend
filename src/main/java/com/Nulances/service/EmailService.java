@@ -10,7 +10,13 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.text.NumberFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.time.Year;
 
 @Service
@@ -71,6 +77,42 @@ public class EmailService {
         }
     }
 
+    public String enviarCobrancaPlano(
+            String destinatario,
+            String nomeUsuario,
+            String nomePlano,
+            BigDecimal valor,
+            Instant vencimento,
+            String checkoutUrl
+    ) {
+        validarConfiguracao();
+
+        String html = carregarTemplate("templates/cobranca-plano.html")
+                .replace("{{nome}}", escapeHtml(nomeUsuario))
+                .replace("{{plano}}", escapeHtml(nomePlano))
+                .replace("{{valor}}", escapeHtml(formatarMoeda(valor)))
+                .replace("{{vencimento}}", escapeHtml(formatarData(vencimento)))
+                .replace("{{checkoutUrl}}", escapeHtml(checkoutUrl))
+                .replace("{{ano}}", String.valueOf(Year.now().getValue()))
+                .replace("{{empresa}}", "Nulances");
+
+        Resend resend = new Resend(resendProperties.apiKey());
+
+        CreateEmailOptions params = CreateEmailOptions.builder()
+                .from(montarFrom())
+                .to(destinatario)
+                .subject("Renovação do plano de anúncios")
+                .html(html)
+                .build();
+
+        try {
+            CreateEmailResponse response = resend.emails().send(params);
+            return response.getId();
+        } catch (ResendException ex) {
+            throw new IllegalStateException("Erro ao enviar e-mail de cobrança do plano", ex);
+        }
+    }
+
     private String carregarTemplate(String path) {
         try {
             ClassPathResource resource = new ClassPathResource(path);
@@ -115,5 +157,20 @@ public class EmailService {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+
+    private String formatarMoeda(BigDecimal valor) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        return formatter.format(valor != null ? valor : BigDecimal.ZERO);
+    }
+
+    private String formatarData(Instant data) {
+        if (data == null) {
+            return "-";
+        }
+
+        return DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                .withZone(ZoneId.of("America/Sao_Paulo"))
+                .format(data);
     }
 }

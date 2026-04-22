@@ -53,6 +53,7 @@ public class SecurityConfig {
                                 "/auth/confirmar-email",
                                 "/auth/reenviar-codigo",
                                 "/auth/disponibilidade/**",
+                                "/payment/webhook/**",
                                 "/error",
                                 "/ws/**",
                                 "/v3/api-docs/**",

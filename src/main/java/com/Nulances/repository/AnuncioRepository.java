@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.Collection;
 
 public interface AnuncioRepository extends JpaRepository<Anuncio, UUID> {
 
@@ -145,4 +146,8 @@ public interface AnuncioRepository extends JpaRepository<Anuncio, UUID> {
     Page<Anuncio> findByStatusOrderByCreatedAtAsc(StatusAnuncio status, Pageable pageable);
 
     long countByStatus(StatusAnuncio status);
+
+    long countByVendedorIdAndStatusIn(UUID vendedorId, Collection<StatusAnuncio> statuses);
+
+    java.util.List<Anuncio> findByVendedorIdAndStatusIn(UUID vendedorId, Collection<StatusAnuncio> statuses);
 }
