@@ -140,4 +140,7 @@ public interface AnuncioRepository extends JpaRepository<Anuncio, UUID> {
           and a.status = com.Nulances.domain.enums.StatusAnuncio.PUBLICADO
     """)
     Optional<Anuncio> findDetalhadoPublicadoById(@Param("id") UUID id);
+
+    @EntityGraph(attributePaths = {"vendedor"})
+    Page<Anuncio> findByStatusOrderByCreatedAtAsc(StatusAnuncio status, Pageable pageable);
 }

@@ -9,6 +9,7 @@ import com.Nulances.dto.response.AnuncioAdminListResponse;
 import com.Nulances.dto.response.AnuncioDetalheTecnicoResponse;
 import com.Nulances.dto.response.AnuncioMidiaListResponse;
 import com.Nulances.dto.response.AnuncioMidiaResponse;
+import com.Nulances.dto.response.AnuncioModerarListResponse;
 import com.Nulances.dto.response.AnuncioPublicoDetalheResponse;
 import com.Nulances.dto.response.AnuncioPublicoDetalheTecnicoResponse;
 import com.Nulances.dto.response.AnuncioPublicoListResponse;
@@ -98,6 +99,16 @@ public class AnuncioMapper {
                 .vendedorId(anuncio.getVendedor().getId())
                 .vendedorNome(anuncio.getVendedor().getNomeCompleto())
                 .midias(midias)
+                .build();
+    }
+
+    public AnuncioModerarListResponse toModerarListResponse(Anuncio anuncio) {
+        return AnuncioModerarListResponse.builder()
+                .id(anuncio.getId())
+                .modelo(anuncio.getModelo())
+                .nomeVendedor(anuncio.getVendedor().getNomeCompleto())
+                .enviadoEm(anuncio.getCreatedAt().atOffset(ZoneOffset.UTC))
+                .tipoVeiculo(anuncio.getTipo())
                 .build();
     }
 

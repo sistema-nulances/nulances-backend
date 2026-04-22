@@ -8,6 +8,7 @@ import com.Nulances.domain.enums.UserRole;
 import com.Nulances.dto.request.ListarAdminAnunciosRequest;
 import com.Nulances.dto.request.SuspenderAnuncioRequest;
 import com.Nulances.dto.response.AnuncioAdminListResponse;
+import com.Nulances.dto.response.AnuncioModerarListResponse;
 import com.Nulances.dto.response.AnuncioStatusResponse;
 import com.Nulances.mapper.AnuncioMapper;
 import com.Nulances.mapper.AnuncioStatusMapper;
@@ -30,6 +31,23 @@ public class AnuncioModerarService {
     private final UsuarioRepository usuarioRepository;
     private final AnuncioMapper anuncioMapper;
     private final AnuncioStatusMapper anuncioStatusMapper;
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public Page<AnuncioModerarListResponse> listarFilaModeracaoDashboard(
+            Pageable pageable,
+            CustomUserDetails userDetails
+    ) {
+        Usuario admin = buscarUsuarioAutenticado(userDetails);
+        validarAdmin(admin);
+
+        Page<Anuncio> page = anuncioRepository.findByStatusOrderByCreatedAtAsc(
+                StatusAnuncio.PENDENTE,
+                pageable
+        );
+
+        return page.map(anuncioMapper::toModerarListResponse);
+    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)

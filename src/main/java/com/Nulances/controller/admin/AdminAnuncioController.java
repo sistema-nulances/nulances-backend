@@ -5,6 +5,7 @@ import com.Nulances.dto.request.EditarAnuncioRequest;
 import com.Nulances.dto.request.ListarAdminAnunciosRequest;
 import com.Nulances.dto.request.SuspenderAnuncioRequest;
 import com.Nulances.dto.response.AnuncioAdminListResponse;
+import com.Nulances.dto.response.AnuncioModerarListResponse;
 import com.Nulances.dto.response.AnuncioResponse;
 import com.Nulances.dto.response.AnuncioStatusResponse;
 import com.Nulances.service.AnuncioModerarService;
@@ -24,6 +25,14 @@ public class AdminAnuncioController {
 
     private final AnuncioModerarService anuncioModerarService;
     private final AnuncioService anuncioService;
+
+    @GetMapping("/moderar/dashboard")
+    public Page<AnuncioModerarListResponse> listarFilaModeracaoDashboard(
+            Pageable pageable,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return anuncioModerarService.listarFilaModeracaoDashboard(pageable, userDetails);
+    }
 
     @GetMapping
     public Page<AnuncioAdminListResponse> listar(
