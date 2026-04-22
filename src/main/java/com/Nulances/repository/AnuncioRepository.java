@@ -143,4 +143,6 @@ public interface AnuncioRepository extends JpaRepository<Anuncio, UUID> {
 
     @EntityGraph(attributePaths = {"vendedor"})
     Page<Anuncio> findByStatusOrderByCreatedAtAsc(StatusAnuncio status, Pageable pageable);
+
+    long countByStatus(StatusAnuncio status);
 }

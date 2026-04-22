@@ -8,6 +8,7 @@ import com.Nulances.dto.response.AnuncioAdminListResponse;
 import com.Nulances.dto.response.AnuncioModerarListResponse;
 import com.Nulances.dto.response.AnuncioResponse;
 import com.Nulances.dto.response.AnuncioStatusResponse;
+import com.Nulances.dto.response.DashboardStatsMarketplaceResponse;
 import com.Nulances.service.AnuncioModerarService;
 import com.Nulances.service.AnuncioService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,13 @@ public class AdminAnuncioController {
 
     private final AnuncioModerarService anuncioModerarService;
     private final AnuncioService anuncioService;
+
+    @GetMapping("/dashboard/stats-marketplace")
+    public DashboardStatsMarketplaceResponse buscarDashboardStatsMarketplace(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return anuncioModerarService.buscarDashboardStatsMarketplace(userDetails);
+    }
 
     @GetMapping("/moderar/dashboard")
     public Page<AnuncioModerarListResponse> listarFilaModeracaoDashboard(

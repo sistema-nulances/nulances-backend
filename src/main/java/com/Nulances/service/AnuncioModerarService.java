@@ -10,6 +10,7 @@ import com.Nulances.dto.request.SuspenderAnuncioRequest;
 import com.Nulances.dto.response.AnuncioAdminListResponse;
 import com.Nulances.dto.response.AnuncioModerarListResponse;
 import com.Nulances.dto.response.AnuncioStatusResponse;
+import com.Nulances.dto.response.DashboardStatsMarketplaceResponse;
 import com.Nulances.mapper.AnuncioMapper;
 import com.Nulances.mapper.AnuncioStatusMapper;
 import com.Nulances.repository.AnuncioRepository;
@@ -181,6 +182,27 @@ public class AnuncioModerarService {
                 "Anúncio suspenso com sucesso.",
                 motivo
         );
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public DashboardStatsMarketplaceResponse buscarDashboardStatsMarketplace(
+            CustomUserDetails userDetails
+    ) {
+        Usuario admin = buscarUsuarioAutenticado(userDetails);
+        validarAdmin(admin);
+
+        long totalAnuncios = anuncioRepository.count();
+        long totalPublicados = anuncioRepository.countByStatus(StatusAnuncio.PUBLICADO);
+        long totalPendentes = anuncioRepository.countByStatus(StatusAnuncio.PENDENTE);
+        long totalSuspensos = anuncioRepository.countByStatus(StatusAnuncio.SUSPENSO);
+
+        return DashboardStatsMarketplaceResponse.builder()
+                .totalAnuncios(totalAnuncios)
+                .totalPublicados(totalPublicados)
+                .totalPendentes(totalPendentes)
+                .totalSuspensos(totalSuspensos)
+                .build();
     }
 
     private Anuncio buscarAnuncioParaSuspensao(UUID anuncioId, Usuario usuario) {
