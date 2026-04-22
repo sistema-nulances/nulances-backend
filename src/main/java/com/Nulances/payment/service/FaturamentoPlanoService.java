@@ -7,8 +7,6 @@ import com.Nulances.dto.response.FaturaPlanoResponse;
 import com.Nulances.payment.config.PaymentProperties;
 import com.Nulances.repository.PagamentoPlanoRepository;
 import com.Nulances.repository.WebhookPagamentoRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -35,7 +33,6 @@ public class FaturamentoPlanoService {
     private final AssinaturaPlanoService assinaturaPlanoService;
     private final PaymentProperties paymentProperties;
     private final MercadoPagoCheckoutService mercadoPagoCheckoutService;
-    private final ObjectMapper objectMapper;
 
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
@@ -201,11 +198,96 @@ public class FaturamentoPlanoService {
     }
 
     private String paraJson(Map<String, Object> payload) {
-        try {
-            return objectMapper.writeValueAsString(payload);
-        } catch (JsonProcessingException ex) {
+        if (payload == null) {
             return "{}";
         }
+        try {
+            return toJsonValue(payload);
+        } catch (Exception ex) {
+            return "{}";
+        }
+    }
+
+    private String toJsonValue(Object value) {
+        if (value == null) {
+            return "null";
+        }
+
+        if (value instanceof String s) {
+            return "\"" + escapeJson(s) + "\"";
+        }
+
+        if (value instanceof Number || value instanceof Boolean) {
+            return String.valueOf(value);
+        }
+
+        if (value instanceof Map<?, ?> map) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+
+            boolean first = true;
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                if (!first) {
+                    sb.append(",");
+                }
+                first = false;
+
+                String key = String.valueOf(entry.getKey());
+                sb.append("\"")
+                        .append(escapeJson(key))
+                        .append("\":")
+                        .append(toJsonValue(entry.getValue()));
+            }
+
+            sb.append("}");
+            return sb.toString();
+        }
+
+        if (value instanceof Iterable<?> iterable) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+
+            boolean first = true;
+            for (Object item : iterable) {
+                if (!first) {
+                    sb.append(",");
+                }
+                first = false;
+                sb.append(toJsonValue(item));
+            }
+
+            sb.append("]");
+            return sb.toString();
+        }
+
+        if (value.getClass().isArray()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+
+            int length = java.lang.reflect.Array.getLength(value);
+            for (int i = 0; i < length; i++) {
+                if (i > 0) {
+                    sb.append(",");
+                }
+                sb.append(toJsonValue(java.lang.reflect.Array.get(value, i)));
+            }
+
+            sb.append("]");
+            return sb.toString();
+        }
+
+        return "\"" + escapeJson(String.valueOf(value)) + "\"";
+    }
+
+    private String escapeJson(String value) {
+        return value
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 
     private Map<String, Object> toMapPagamentoExterno(MercadoPagoCheckoutService.MercadoPagoPaymentData data) {
@@ -256,5 +338,4 @@ public class FaturamentoPlanoService {
                 .checkoutUrl(pagamento.getCheckoutUrl())
                 .build();
     }
-
 }
