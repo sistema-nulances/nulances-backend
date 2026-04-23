@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -97,6 +98,7 @@ public class LeilaoService {
 
         Leilao leilao = new Leilao();
         leilao.setTitulo(request.getTitulo());
+        leilao.setLinkLive(normalizarLinkLive(request.getLinkLive()));
         leilao.setFormato(request.getFormato());
         leilao.setCidade(request.getCidade());
         leilao.setEndereco(request.getEndereco());
@@ -248,6 +250,7 @@ public class LeilaoService {
         LeilaoPainelResponse response = new LeilaoPainelResponse();
         response.setLeilaoId(leilao.getId());
         response.setTitulo(leilao.getTitulo());
+        response.setLinkLive(leilao.getLinkLive());
         response.setLeiloeiro(leilao.getLeiloeiro().getNome());
         response.setFormato(leilao.getFormato());
         response.setCidade(leilao.getFormato() == FormatoLeilao.PRESENCIAL ? leilao.getCidade() : null);
@@ -541,5 +544,26 @@ public class LeilaoService {
                 incrementoMinimo.multiply(BigDecimal.valueOf(3)),
                 incrementoMinimo.multiply(BigDecimal.valueOf(4))
         );
+    }
+
+    private String normalizarLinkLive(String linkLive) {
+        if (linkLive == null || linkLive.isBlank()) {
+            return null;
+        }
+
+        String valor = linkLive.trim();
+        URI uri;
+        try {
+            uri = URI.create(valor);
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("Link da live inválido. Informe uma URL válida.");
+        }
+
+        String scheme = uri.getScheme();
+        if (scheme == null || (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme))) {
+            throw new IllegalArgumentException("Link da live inválido. Use URL http ou https.");
+        }
+
+        return valor;
     }
 }

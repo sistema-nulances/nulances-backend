@@ -18,6 +18,7 @@ public class LeilaoPainelResponse {
 
     private UUID leilaoId;
     private String titulo;
+    private String linkLive;
     private String leiloeiro;
     private FormatoLeilao formato;
     private String cidade;

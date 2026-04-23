@@ -30,6 +30,7 @@ public enum MarcaVeiculo {
     MASERATI,
     MAZDA,
     MCLAREN,
+    MERCEDES,
     MG,
     MINI,
     MITSUBISHI,

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +21,9 @@ public class LeilaoCreateRequest {
 
     @NotBlank(message = "Título é obrigatório.")
     private String titulo;
+
+    @Size(max = 500, message = "Link da live deve ter no máximo 500 caracteres.")
+    private String linkLive;
 
     @NotNull(message = "Formato do leilão é obrigatório.")
     private FormatoLeilao formato;

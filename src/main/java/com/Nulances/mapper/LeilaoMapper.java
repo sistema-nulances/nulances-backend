@@ -20,6 +20,7 @@ public class LeilaoMapper {
         LeilaoResponse response = new LeilaoResponse();
         response.setId(entity.getId());
         response.setTitulo(entity.getTitulo());
+        response.setLinkLive(entity.getLinkLive());
         response.setFormato(entity.getFormato());
         response.setCidade(entity.getCidade());
         response.setEndereco(entity.getEndereco());

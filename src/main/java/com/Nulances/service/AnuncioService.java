@@ -302,6 +302,28 @@ public class AnuncioService {
         if (request.getDetalheTecnico() != null) {
             aplicarEdicaoDetalheTecnico(anuncio, request.getDetalheTecnico());
         }
+
+        if (request.getMidiasAdicionar() != null && !request.getMidiasAdicionar().isEmpty()) {
+            int baseOrdem = obterProximaOrdemMidia(anuncio);
+            for (int i = 0; i < request.getMidiasAdicionar().size(); i++) {
+                AnuncioMidiaRequest midiaRequest = request.getMidiasAdicionar().get(i);
+                AnuncioMidia midia = new AnuncioMidia();
+                midia.setTipo(midiaRequest.getTipo());
+                midia.setArquivo(trim(midiaRequest.getArquivo()));
+                midia.setOrdem(baseOrdem + i);
+                anuncio.adicionarMidia(midia);
+            }
+        }
+    }
+
+    private int obterProximaOrdemMidia(Anuncio anuncio) {
+        if (anuncio.getMidias() == null || anuncio.getMidias().isEmpty()) {
+            return 0;
+        }
+        return anuncio.getMidias().stream()
+                .mapToInt(m -> m.getOrdem() != null ? m.getOrdem() : 0)
+                .max()
+                .orElse(-1) + 1;
     }
 
     private void aplicarEdicaoDetalheTecnico(Anuncio anuncio, EditarAnuncioDetalheTecnicoRequest request) {

@@ -19,6 +19,9 @@ public class Leilao extends AuditableEntity {
     @Column(nullable = false)
     private String titulo;
 
+    @Column(name = "link_live", length = 500)
+    private String linkLive;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private FormatoLeilao formato;

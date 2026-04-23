@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -33,4 +34,11 @@ public class EditarAnuncioRequest {
 
     @Valid
     private EditarAnuncioDetalheTecnicoRequest detalheTecnico;
+
+    /**
+     * Novas mídias a anexar ao anúncio (upload já realizado; enviar {@code objectKey} retornado pelo endpoint de upload).
+     * Itens são acrescentados às mídias existentes, com ordem sequencial após a última.
+     */
+    @Valid
+    private List<AnuncioMidiaRequest> midiasAdicionar;
 }

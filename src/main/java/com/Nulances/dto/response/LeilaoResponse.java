@@ -16,6 +16,7 @@ public class LeilaoResponse {
 
     private UUID id;
     private String titulo;
+    private String linkLive;
     private FormatoLeilao formato;
     private String cidade;
     private String endereco;
