@@ -113,6 +113,42 @@ public class EmailService {
         }
     }
 
+    public String enviarAvisoArrematacaoVencedora(
+            String destinatario,
+            String nomeUsuario,
+            String tituloLeilao,
+            String codigoLote,
+            String nomeBem,
+            BigDecimal valorFinal
+    ) {
+        validarConfiguracao();
+
+        String html = carregarTemplate("templates/arrematacao-vencedora.html")
+                .replace("{{nome}}", escapeHtml(nomeUsuario))
+                .replace("{{tituloLeilao}}", escapeHtml(tituloLeilao))
+                .replace("{{codigoLote}}", escapeHtml(codigoLote))
+                .replace("{{nomeBem}}", escapeHtml(nomeBem))
+                .replace("{{valorFinal}}", escapeHtml(formatarMoeda(valorFinal)))
+                .replace("{{ano}}", String.valueOf(Year.now().getValue()))
+                .replace("{{empresa}}", "Nulances");
+
+        Resend resend = new Resend(resendProperties.apiKey());
+
+        CreateEmailOptions params = CreateEmailOptions.builder()
+                .from(montarFrom())
+                .to(destinatario)
+                .subject("Parabéns! Você venceu um lote no leilão")
+                .html(html)
+                .build();
+
+        try {
+            CreateEmailResponse response = resend.emails().send(params);
+            return response.getId();
+        } catch (ResendException ex) {
+            throw new IllegalStateException("Erro ao enviar e-mail de arrematação vencedora", ex);
+        }
+    }
+
     private String carregarTemplate(String path) {
         try {
             ClassPathResource resource = new ClassPathResource(path);

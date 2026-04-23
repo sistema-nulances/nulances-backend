@@ -5,6 +5,8 @@ import com.Nulances.domain.entity.Bem;
 import com.Nulances.domain.entity.LeilaoLoteBem;
 import com.Nulances.domain.enums.StatusBem;
 import com.Nulances.domain.enums.StatusItemLeilao;
+import com.Nulances.dto.messaging.ArrematacaoVencedorMessage;
+import com.Nulances.messaging.publisher.ArrematacaoVencedorPublisher;
 import com.Nulances.repository.ArrematacaoRepository;
 import com.Nulances.repository.BemRepository;
 import com.Nulances.repository.LeilaoLoteBemRepository;
@@ -31,6 +33,7 @@ public class LeilaoSchedulerService {
     private final LeilaoRepository leilaoRepository;
     private final LeilaoService leilaoService;
     private final BemRepository bemRepository;
+    private final ArrematacaoVencedorPublisher arrematacaoVencedorPublisher;
 
     @Scheduled(fixedDelay = 3000)
     @Transactional
@@ -94,7 +97,18 @@ public class LeilaoSchedulerService {
                     arrematacao.setValorFinal(item.getMaiorLance().getValor());
                     arrematacao.setProcessadoEm(Instant.now());
 
-                    arrematacaoRepository.save(arrematacao);
+                    arrematacao = arrematacaoRepository.save(arrematacao);
+
+                    arrematacaoVencedorPublisher.publicar(new ArrematacaoVencedorMessage(
+                            arrematacao.getId(),
+                            arrematacao.getUsuario().getId(),
+                            arrematacao.getUsuario().getEmail(),
+                            arrematacao.getUsuario().getNomeCompleto(),
+                            item.getLeilaoLote().getLeilao().getTitulo(),
+                            item.getLeilaoLote().getLote().getCodigo(),
+                            item.getBem().getModelo(),
+                            arrematacao.getValorFinal()
+                    ));
                 }
 
                 item.setStatus(StatusItemLeilao.ARREMATADO);

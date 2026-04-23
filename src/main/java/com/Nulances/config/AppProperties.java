@@ -12,6 +12,7 @@ public record AppProperties(
     public record Jms(
             String queueEmailConfirmacao,
             String queueLanceRecebido,
-            String queueCobrancaPlano
+            String queueCobrancaPlano,
+            String queueArrematacaoVencedor
     ) {}
 }
