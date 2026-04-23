@@ -74,8 +74,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000",
+        // Em apps mobile (Expo/React Native) normalmente não há CORS como no browser,
+        // mas o web (localhost/LAN) precisa estar liberado durante desenvolvimento.
+        configuration.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "http://127.0.0.1:*",
+                "http://192.168.*:*",
+                "http://10.*:*",
+                "http://172.*:*",
+                "exp://*",
                 "https://www.nulances.com",
                 "https://nulances.com"
         ));
