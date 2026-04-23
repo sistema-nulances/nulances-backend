@@ -95,6 +95,14 @@ public class AnuncioController {
             @RequestBody(required = false) SuspenderAnuncioRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        return anuncioModerarService.suspender(id, request, userDetails);
+        return anuncioModerarService.suspenderMeuAnuncio(id, request, userDetails);
+    }
+
+    @DeleteMapping("/meus/{id}")
+    public void excluirMeuAnuncio(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        anuncioService.excluirMeuAnuncio(id, userDetails);
     }
 }

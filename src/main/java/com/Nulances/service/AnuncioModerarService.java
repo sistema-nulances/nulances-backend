@@ -184,6 +184,42 @@ public class AnuncioModerarService {
         );
     }
 
+    @PreAuthorize("hasRole('VENDEDOR')")
+    @Transactional
+    public AnuncioStatusResponse suspenderMeuAnuncio(
+            UUID anuncioId,
+            SuspenderAnuncioRequest request,
+            CustomUserDetails userDetails
+    ) {
+        Usuario vendedor = buscarUsuarioAutenticado(userDetails);
+
+        if (vendedor.getRole() != UserRole.VENDEDOR) {
+            throw new IllegalArgumentException("Somente vendedores podem suspender o próprio anúncio.");
+        }
+
+        Anuncio anuncio = anuncioRepository.findDetalhadoByIdAndVendedorId(anuncioId, vendedor.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Anúncio não encontrado."));
+
+        if (anuncio.getStatus() == StatusAnuncio.SUSPENSO) {
+            throw new IllegalArgumentException("Este anúncio já está suspenso.");
+        }
+
+        if (anuncio.getStatus() != StatusAnuncio.PENDENTE && anuncio.getStatus() != StatusAnuncio.PUBLICADO) {
+            throw new IllegalArgumentException("Somente anúncios pendentes ou publicados podem ser suspensos.");
+        }
+
+        anuncio.setStatus(StatusAnuncio.SUSPENSO);
+        anuncio = anuncioRepository.save(anuncio);
+
+        String motivo = request != null ? normalizarTextoOpcional(request.getMotivo()) : null;
+
+        return anuncioStatusMapper.toResponse(
+                anuncio,
+                "Anúncio suspenso com sucesso.",
+                motivo
+        );
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional(readOnly = true)
     public DashboardStatsMarketplaceResponse buscarDashboardStatsMarketplace(

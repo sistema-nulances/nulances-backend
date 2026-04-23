@@ -215,6 +215,18 @@ public class AnuncioService {
         return anuncioMapper.toResponse(anuncioAtualizado);
     }
 
+    @PreAuthorize("hasRole('VENDEDOR')")
+    @Transactional
+    public void excluirMeuAnuncio(UUID id, CustomUserDetails userDetails) {
+        Usuario vendedor = buscarUsuarioAutenticado(userDetails);
+        validarVendedor(vendedor);
+
+        Anuncio anuncio = anuncioRepository.findDetalhadoByIdAndVendedorId(id, vendedor.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Anúncio não encontrado."));
+
+        anuncioRepository.delete(anuncio);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public AnuncioResponse editarParcialParaAdmin(UUID id, EditarAnuncioRequest request, CustomUserDetails userDetails) {
@@ -381,6 +393,12 @@ public class AnuncioService {
     private void validarAdmin(Usuario usuario) {
         if (usuario.getRole() != UserRole.ADMIN) {
             throw new IllegalArgumentException("Somente administradores podem acessar anúncios de administração.");
+        }
+    }
+
+    private void validarVendedor(Usuario usuario) {
+        if (usuario.getRole() != UserRole.VENDEDOR) {
+            throw new IllegalArgumentException("Somente vendedores podem excluir o próprio anúncio.");
         }
     }
 
