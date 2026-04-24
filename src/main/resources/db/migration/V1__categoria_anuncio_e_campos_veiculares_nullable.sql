@@ -10,7 +10,7 @@ BEGIN
             ADD COLUMN IF NOT EXISTS categoria VARCHAR(60);
 
         UPDATE anuncios
-        SET categoria = 'VEICULOS'
+        SET categoria = 'COMERCIO'
         WHERE categoria IS NULL;
 
         ALTER TABLE anuncios
