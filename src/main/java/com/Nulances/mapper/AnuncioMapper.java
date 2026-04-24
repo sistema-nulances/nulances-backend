@@ -4,7 +4,6 @@ import com.Nulances.domain.entity.Anuncio;
 import com.Nulances.domain.entity.AnuncioDetalheTecnico;
 import com.Nulances.domain.entity.AnuncioMidia;
 import com.Nulances.domain.entity.Usuario;
-import com.Nulances.domain.enums.TipoMidiaAnuncio;
 import com.Nulances.dto.response.AnuncioAdminListResponse;
 import com.Nulances.dto.response.AnuncioDetalheTecnicoResponse;
 import com.Nulances.dto.response.AnuncioMidiaListResponse;
@@ -114,7 +113,6 @@ public class AnuncioMapper {
 
     public AnuncioPublicoListResponse toPublicoListResponse(Anuncio anuncio) {
         List<AnuncioPublicoMidiaResponse> imagens = anuncio.getMidias().stream()
-                .filter(midia -> midia.getTipo() == TipoMidiaAnuncio.FOTO)
                 .sorted(Comparator.comparing(AnuncioMidia::getOrdem))
                 .map(this::toPublicoMidiaResponse)
                 .toList();
