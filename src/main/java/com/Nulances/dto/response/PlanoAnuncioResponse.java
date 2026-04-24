@@ -14,5 +14,6 @@ public class PlanoAnuncioResponse {
     private String descricao;
     private BigDecimal valorMensal;
     private Integer totalAnuncios;
+    private Boolean ilimitado;
     private Boolean ativo;
 }

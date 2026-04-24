@@ -73,6 +73,7 @@ public class PlanoMarketplaceService {
                 .descricao(plano.getDescricao())
                 .valorMensal(plano.getValorMensal())
                 .totalAnuncios(plano.getTotalAnuncios())
+                .ilimitado(plano.getIlimitado())
                 .ativo(plano.getAtivo())
                 .build();
     }

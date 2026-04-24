@@ -99,7 +99,9 @@ public class AssinaturaPlanoService {
                 Set.of(StatusAnuncio.PENDENTE, StatusAnuncio.PUBLICADO)
         );
 
-        if (totalUsado >= assinatura.getPlano().getTotalAnuncios()) {
+        PlanoAnuncio plano = assinatura.getPlano();
+        if (!Boolean.TRUE.equals(plano.getIlimitado())
+                && totalUsado >= plano.getTotalAnuncios()) {
             throw new IllegalArgumentException("Limite de anúncios do plano atingido. Faça upgrade no painel de planos.");
         }
     }
@@ -115,7 +117,11 @@ public class AssinaturaPlanoService {
             assinatura.setInicioVigencia(agora);
         }
         assinatura.setUltimaCobrancaEm(agora);
-        assinatura.setProximaCobranca(agora.plus(diasVigencia, ChronoUnit.DAYS));
+        if (Boolean.TRUE.equals(assinatura.getPlano().getIlimitado())) {
+            assinatura.setProximaCobranca(null);
+        } else {
+            assinatura.setProximaCobranca(agora.plus(diasVigencia, ChronoUnit.DAYS));
+        }
         assinaturaPlanoRepository.save(assinatura);
     }
 
@@ -178,7 +184,9 @@ public class AssinaturaPlanoService {
                 assinatura.getVendedor().getId(),
                 Set.of(StatusAnuncio.PENDENTE, StatusAnuncio.PUBLICADO)
         );
-        int anunciosDisponiveis = Math.max(0, plano.getTotalAnuncios() - (int) totalUsado);
+        Integer anunciosDisponiveis = Boolean.TRUE.equals(plano.getIlimitado())
+                ? null
+                : Math.max(0, plano.getTotalAnuncios() - (int) totalUsado);
 
         return MinhaAssinaturaPlanoResponse.builder()
                 .assinaturaId(assinatura.getId())
@@ -192,6 +200,7 @@ public class AssinaturaPlanoService {
                         .descricao(plano.getDescricao())
                         .valorMensal(plano.getValorMensal())
                         .totalAnuncios(plano.getTotalAnuncios())
+                        .ilimitado(plano.getIlimitado())
                         .ativo(plano.getAtivo())
                         .build())
                 .build();

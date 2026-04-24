@@ -27,5 +27,8 @@ public class PlanoAnuncio extends AuditableEntity {
     private Integer totalAnuncios;
 
     @Column(nullable = false)
+    private Boolean ilimitado = false;
+
+    @Column(nullable = false)
     private Boolean ativo = true;
 }

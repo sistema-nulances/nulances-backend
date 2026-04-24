@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.math.BigDecimal;
 
@@ -16,6 +17,7 @@ public class PlanoSeedConfig {
     private final PlanoAnuncioRepository planoAnuncioRepository;
 
     @Bean
+    @Order(10)
     public CommandLineRunner seedPlanosPadrao() {
         return args -> {
             criarSeNaoExistir("BASICO", "Plano básico para começar", new BigDecimal("59.90"), 3);
@@ -35,6 +37,7 @@ public class PlanoSeedConfig {
         plano.setValorMensal(valor);
         plano.setTotalAnuncios(totalAnuncios);
         plano.setAtivo(true);
+        plano.setIlimitado(false);
         planoAnuncioRepository.save(plano);
     }
 }

@@ -34,6 +34,10 @@ public class CobrancaRecorrenteSchedulerService {
         List<AssinaturaPlano> assinaturas = assinaturaPlanoService.buscarAssinaturasParaRenovar();
 
         for (AssinaturaPlano assinatura : assinaturas) {
+            if (Boolean.TRUE.equals(assinatura.getPlano().getIlimitado())) {
+                continue;
+            }
+
             boolean jaPossuiCobrancaAberta = pagamentoPlanoRepository
                     .findFirstByAssinaturaIdAndStatusOrderByCreatedAtDesc(
                             assinatura.getId(),
