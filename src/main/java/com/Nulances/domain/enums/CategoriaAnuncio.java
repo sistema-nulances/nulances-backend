@@ -1,6 +1,7 @@
 package com.Nulances.domain.enums;
 
 public enum CategoriaAnuncio {
+    VEICULOS,
     IMOVEIS,
     CELULARES_E_TELEFONIA,
     CASA_DECORACAO_E_UTENSILIOS,

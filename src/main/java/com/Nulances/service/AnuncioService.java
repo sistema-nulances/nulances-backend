@@ -6,9 +6,13 @@ import com.Nulances.domain.entity.AnuncioDetalheTecnico;
 import com.Nulances.domain.entity.AnuncioMidia;
 import com.Nulances.domain.entity.Marca;
 import com.Nulances.domain.entity.Usuario;
+import com.Nulances.domain.enums.CambioVeiculo;
 import com.Nulances.domain.enums.MarcaVeiculo;
 import com.Nulances.domain.enums.CategoriaAnuncio;
+import com.Nulances.domain.enums.CombustivelVeiculo;
+import com.Nulances.domain.enums.CondicaoAnuncioVeiculo;
 import com.Nulances.domain.enums.StatusAnuncio;
+import com.Nulances.domain.enums.TipoVeiculo;
 import com.Nulances.domain.enums.UserRole;
 import com.Nulances.dto.request.AnuncioDetalheTecnicoRequest;
 import com.Nulances.dto.request.AnuncioMidiaRequest;
@@ -29,6 +33,7 @@ import com.Nulances.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -110,32 +115,45 @@ public class AnuncioService {
     ) {
         String busca = normalizarBusca(request != null ? request.getBusca() : null);
         CategoriaAnuncio categoria = request != null ? request.getCategoria() : null;
+        TipoVeiculo tipo = request != null ? request.getTipo() : null;
+        CondicaoAnuncioVeiculo condicao = request != null ? request.getCondicao() : null;
+        CombustivelVeiculo combustivel = request != null ? request.getCombustivel() : null;
+        CambioVeiculo cambio = request != null ? request.getCambio() : null;
 
-        Page<Anuncio> page;
+        Specification<Anuncio> spec = (root, query, cb) -> cb.equal(root.get("status"), StatusAnuncio.PUBLICADO);
 
-        if (busca == null && categoria == null) {
-            page = anuncioRepository.findAllByStatusOrderByCreatedAtDesc(StatusAnuncio.PUBLICADO, pageable);
-        } else if (busca == null) {
-            page = anuncioRepository.findAllByStatusAndCategoriaOrderByCreatedAtDesc(
-                    StatusAnuncio.PUBLICADO,
-                    categoria,
-                    pageable
-            );
-        } else if (categoria == null) {
-            page = anuncioRepository.findAllByStatusAndModeloContainingIgnoreCaseOrderByCreatedAtDesc(
-                    StatusAnuncio.PUBLICADO,
-                    busca,
-                    pageable
-            );
-        } else {
-            page = anuncioRepository.findAllByStatusAndCategoriaAndModeloContainingIgnoreCaseOrderByCreatedAtDesc(
-                    StatusAnuncio.PUBLICADO,
-                    categoria,
-                    busca,
-                    pageable
+        if (categoria != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("categoria"), categoria));
+        }
+        if (busca != null) {
+            String padrao = "%" + busca.toLowerCase() + "%";
+            spec = spec.and((root, query, cb) -> cb.like(cb.lower(root.get("modelo")), padrao));
+        }
+        if (tipo != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("tipo"), tipo));
+        }
+        if (condicao != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("condicao"), condicao));
+        }
+        if (combustivel != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("combustivel"), combustivel));
+        }
+        if (cambio != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("cambio"), cambio));
+        }
+
+        Specification<Anuncio> ordered = spec;
+
+        Pageable ordenado = pageable;
+        if (pageable != null && pageable.getSort().isUnsorted()) {
+            ordenado = org.springframework.data.domain.PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt")
             );
         }
 
+        Page<Anuncio> page = anuncioRepository.findAll(ordered, ordenado);
         return page.map(anuncioMapper::toPublicoListResponse);
     }
 
