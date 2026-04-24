@@ -42,17 +42,18 @@ public class AnuncioMapper {
                 anuncio.getId(),
                 anuncio.getVendedor().getId(),
                 anuncio.getVendedor().getNomeCompleto(),
-                anuncio.getMarca().getId(),
-                anuncio.getMarca().getNome().name(),
+                anuncio.getMarca() != null ? anuncio.getMarca().getId() : null,
+                anuncio.getMarca() != null ? anuncio.getMarca().getNome().name() : null,
+                anuncio.getCategoria(),
                 anuncio.getModelo(),
                 anuncio.getPreco(),
                 anuncio.getCidade(),
-                anuncio.getTipo().name(),
-                anuncio.getCondicao().name(),
+                enumName(anuncio.getTipo()),
+                enumName(anuncio.getCondicao()),
                 anuncio.getAno(),
                 anuncio.getQuilometragem(),
-                anuncio.getCombustivel().name(),
-                anuncio.getCambio().name(),
+                enumName(anuncio.getCombustivel()),
+                enumName(anuncio.getCambio()),
                 anuncio.getFinalChassi(),
                 anuncio.getCor(),
                 anuncio.getBlindado(),
@@ -73,8 +74,9 @@ public class AnuncioMapper {
 
         return AnuncioVendedorListResponse.builder()
                 .id(anuncio.getId())
+                .categoria(anuncio.getCategoria())
                 .modelo(anuncio.getModelo())
-                .marcaVeiculo(anuncio.getMarca().getNome())
+                .marcaVeiculo(anuncio.getMarca() != null ? anuncio.getMarca().getNome() : null)
                 .quandoFoiPostado(anuncio.getCreatedAt().atOffset(ZoneOffset.UTC))
                 .valor(anuncio.getPreco())
                 .status(anuncio.getStatus())
@@ -90,8 +92,9 @@ public class AnuncioMapper {
 
         return AnuncioAdminListResponse.builder()
                 .id(anuncio.getId())
+                .categoria(anuncio.getCategoria())
                 .modelo(anuncio.getModelo())
-                .marcaVeiculo(anuncio.getMarca().getNome())
+                .marcaVeiculo(anuncio.getMarca() != null ? anuncio.getMarca().getNome() : null)
                 .quandoFoiPostado(anuncio.getCreatedAt().atOffset(ZoneOffset.UTC))
                 .valor(anuncio.getPreco())
                 .status(anuncio.getStatus())
@@ -119,8 +122,9 @@ public class AnuncioMapper {
 
         return AnuncioPublicoListResponse.builder()
                 .id(anuncio.getId())
+                .categoria(anuncio.getCategoria())
                 .modelo(anuncio.getModelo())
-                .marcaVeiculo(anuncio.getMarca().getNome())
+                .marcaVeiculo(anuncio.getMarca() != null ? anuncio.getMarca().getNome() : null)
                 .preco(anuncio.getPreco())
                 .cidade(anuncio.getCidade())
                 .tipoVeiculo(anuncio.getTipo())
@@ -141,7 +145,8 @@ public class AnuncioMapper {
 
         return AnuncioPublicoDetalheResponse.builder()
                 .id(anuncio.getId())
-                .marcaVeiculo(anuncio.getMarca().getNome())
+                .categoria(anuncio.getCategoria())
+                .marcaVeiculo(anuncio.getMarca() != null ? anuncio.getMarca().getNome() : null)
                 .modelo(anuncio.getModelo())
                 .preco(anuncio.getPreco())
                 .cidade(anuncio.getCidade())
@@ -317,5 +322,9 @@ public class AnuncioMapper {
                 objectKey,
                 r2Properties.downloadExpiresInSeconds()
         );
+    }
+
+    private String enumName(Enum<?> value) {
+        return value != null ? value.name() : null;
     }
 }

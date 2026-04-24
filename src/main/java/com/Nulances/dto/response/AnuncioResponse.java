@@ -1,5 +1,6 @@
 package com.Nulances.dto.response;
 
+import com.Nulances.domain.enums.CategoriaAnuncio;
 import com.Nulances.domain.enums.StatusAnuncio;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +19,7 @@ public class AnuncioResponse {
     private String vendedorNome;
     private UUID marcaId;
     private String marca;
+    private CategoriaAnuncio categoria;
     private String modelo;
     private BigDecimal preco;
     private String cidade;

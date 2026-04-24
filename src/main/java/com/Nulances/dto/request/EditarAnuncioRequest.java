@@ -1,6 +1,7 @@
 package com.Nulances.dto.request;
 
 import com.Nulances.domain.enums.CambioVeiculo;
+import com.Nulances.domain.enums.CategoriaAnuncio;
 import com.Nulances.domain.enums.CombustivelVeiculo;
 import com.Nulances.domain.enums.CondicaoAnuncioVeiculo;
 import com.Nulances.domain.enums.MarcaVeiculo;
@@ -16,6 +17,7 @@ import java.util.List;
 @Setter
 public class EditarAnuncioRequest {
 
+    private CategoriaAnuncio categoria;
     private MarcaVeiculo marca;
     private String modelo;
     private BigDecimal preco;

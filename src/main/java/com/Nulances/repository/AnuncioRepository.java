@@ -1,6 +1,7 @@
 package com.Nulances.repository;
 
 import com.Nulances.domain.entity.Anuncio;
+import com.Nulances.domain.enums.CategoriaAnuncio;
 import com.Nulances.domain.enums.StatusAnuncio;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -99,6 +100,21 @@ public interface AnuncioRepository extends JpaRepository<Anuncio, UUID> {
     @EntityGraph(attributePaths = {"marca", "midias"})
     Page<Anuncio> findAllByStatusAndModeloContainingIgnoreCaseOrderByCreatedAtDesc(
             StatusAnuncio status,
+            String modelo,
+            Pageable pageable
+    );
+
+    @EntityGraph(attributePaths = {"marca", "midias"})
+    Page<Anuncio> findAllByStatusAndCategoriaOrderByCreatedAtDesc(
+            StatusAnuncio status,
+            CategoriaAnuncio categoria,
+            Pageable pageable
+    );
+
+    @EntityGraph(attributePaths = {"marca", "midias"})
+    Page<Anuncio> findAllByStatusAndCategoriaAndModeloContainingIgnoreCaseOrderByCreatedAtDesc(
+            StatusAnuncio status,
+            CategoriaAnuncio categoria,
             String modelo,
             Pageable pageable
     );

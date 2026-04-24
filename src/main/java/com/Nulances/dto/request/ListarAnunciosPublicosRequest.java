@@ -1,5 +1,6 @@
 package com.Nulances.dto.request;
 
+import com.Nulances.domain.enums.CategoriaAnuncio;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,4 +9,5 @@ import lombok.Setter;
 public class ListarAnunciosPublicosRequest {
 
     private String busca;
+    private CategoriaAnuncio categoria;
 }

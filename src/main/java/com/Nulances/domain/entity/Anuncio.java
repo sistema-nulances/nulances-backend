@@ -19,9 +19,13 @@ public class Anuncio extends AuditableEntity {
     @JoinColumn(name = "vendedor_id", nullable = false)
     private Usuario vendedor;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "marca_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "marca_id")
     private Marca marca;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 60)
+    private CategoriaAnuncio categoria;
 
     @Column(nullable = false)
     private String modelo;
@@ -33,24 +37,24 @@ public class Anuncio extends AuditableEntity {
     private String cidade;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private TipoVeiculo tipo;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private CondicaoAnuncioVeiculo condicao;
 
-    @Column(nullable = false)
+    @Column
     private Integer ano;
 
     private Long quilometragem;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private CombustivelVeiculo combustivel;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private CambioVeiculo cambio;
 
     @Column(name = "final_chassi", length = 10)

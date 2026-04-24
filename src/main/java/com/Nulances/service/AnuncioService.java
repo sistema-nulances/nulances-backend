@@ -7,6 +7,7 @@ import com.Nulances.domain.entity.AnuncioMidia;
 import com.Nulances.domain.entity.Marca;
 import com.Nulances.domain.entity.Usuario;
 import com.Nulances.domain.enums.MarcaVeiculo;
+import com.Nulances.domain.enums.CategoriaAnuncio;
 import com.Nulances.domain.enums.StatusAnuncio;
 import com.Nulances.domain.enums.UserRole;
 import com.Nulances.dto.request.AnuncioDetalheTecnicoRequest;
@@ -60,6 +61,7 @@ public class AnuncioService {
 
         Anuncio anuncio = new Anuncio();
         anuncio.setVendedor(vendedor);
+        anuncio.setCategoria(request.getCategoria());
         anuncio.setMarca(marca);
         anuncio.setModelo(trim(request.getModelo()));
         anuncio.setPreco(request.getPreco());
@@ -77,7 +79,7 @@ public class AnuncioService {
         anuncio.setDescricao(trim(request.getDescricao()));
         anuncio.setStatus(StatusAnuncio.PENDENTE);
 
-        if (request.getDetalheTecnico() != null) {
+        if (request.getDetalheTecnico() != null && isCategoriaVeiculo(request.getCategoria())) {
             anuncio.definirDetalheTecnico(criarDetalheTecnico(request.getDetalheTecnico()));
         }
 
@@ -107,14 +109,28 @@ public class AnuncioService {
             Pageable pageable
     ) {
         String busca = normalizarBusca(request != null ? request.getBusca() : null);
+        CategoriaAnuncio categoria = request != null ? request.getCategoria() : null;
 
         Page<Anuncio> page;
 
-        if (busca == null) {
+        if (busca == null && categoria == null) {
             page = anuncioRepository.findAllByStatusOrderByCreatedAtDesc(StatusAnuncio.PUBLICADO, pageable);
-        } else {
+        } else if (busca == null) {
+            page = anuncioRepository.findAllByStatusAndCategoriaOrderByCreatedAtDesc(
+                    StatusAnuncio.PUBLICADO,
+                    categoria,
+                    pageable
+            );
+        } else if (categoria == null) {
             page = anuncioRepository.findAllByStatusAndModeloContainingIgnoreCaseOrderByCreatedAtDesc(
                     StatusAnuncio.PUBLICADO,
+                    busca,
+                    pageable
+            );
+        } else {
+            page = anuncioRepository.findAllByStatusAndCategoriaAndModeloContainingIgnoreCaseOrderByCreatedAtDesc(
+                    StatusAnuncio.PUBLICADO,
+                    categoria,
                     busca,
                     pageable
             );
@@ -247,6 +263,10 @@ public class AnuncioService {
     }
 
     private void aplicarEdicao(Anuncio anuncio, EditarAnuncioRequest request) {
+        if (request.getCategoria() != null) {
+            anuncio.setCategoria(request.getCategoria());
+        }
+
         if (request.getMarca() != null) {
             anuncio.setMarca(buscarMarca(request.getMarca()));
         }
@@ -311,7 +331,7 @@ public class AnuncioService {
             anuncio.setDescricao(request.getDescricao().trim());
         }
 
-        if (request.getDetalheTecnico() != null) {
+        if (request.getDetalheTecnico() != null && isCategoriaVeiculo(anuncio.getCategoria())) {
             aplicarEdicaoDetalheTecnico(anuncio, request.getDetalheTecnico());
         }
 
@@ -409,7 +429,7 @@ public class AnuncioService {
 
     private Marca buscarMarca(MarcaVeiculo marcaVeiculo) {
         if (marcaVeiculo == null) {
-            throw new IllegalArgumentException("Marca é obrigatória.");
+            return null;
         }
 
         return marcaRepository.findByNome(marcaVeiculo)
@@ -485,5 +505,9 @@ public class AnuncioService {
             return null;
         }
         return valor.trim();
+    }
+
+    private boolean isCategoriaVeiculo(CategoriaAnuncio categoria) {
+        return categoria == null;
     }
 }

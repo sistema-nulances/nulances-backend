@@ -13,7 +13,9 @@ import java.util.List;
 @Setter
 public class CriarAnuncioRequest {
 
-    @NotNull(message = "Marca é obrigatória.")
+    @NotNull(message = "Categoria é obrigatória.")
+    private CategoriaAnuncio categoria;
+
     private MarcaVeiculo marca;
 
     @NotBlank(message = "Modelo é obrigatório.")
@@ -26,21 +28,16 @@ public class CriarAnuncioRequest {
     @NotBlank(message = "Cidade é obrigatória.")
     private String cidade;
 
-    @NotNull(message = "Tipo é obrigatório.")
     private TipoVeiculo tipo;
 
-    @NotNull(message = "Condição é obrigatória.")
     private CondicaoAnuncioVeiculo condicao;
 
-    @NotNull(message = "Ano é obrigatório.")
     private Integer ano;
 
     private Long quilometragem;
 
-    @NotNull(message = "Combustível é obrigatório.")
     private CombustivelVeiculo combustivel;
 
-    @NotNull(message = "Câmbio é obrigatório.")
     private CambioVeiculo cambio;
 
     private String finalChassi;

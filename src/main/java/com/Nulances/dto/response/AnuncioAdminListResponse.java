@@ -1,5 +1,6 @@
 package com.Nulances.dto.response;
 
+import com.Nulances.domain.enums.CategoriaAnuncio;
 import com.Nulances.domain.enums.MarcaVeiculo;
 import com.Nulances.domain.enums.StatusAnuncio;
 import lombok.Builder;
@@ -15,6 +16,7 @@ import java.util.UUID;
 public class AnuncioAdminListResponse {
 
     private UUID id;
+    private CategoriaAnuncio categoria;
     private String modelo;
     private MarcaVeiculo marcaVeiculo;
     private OffsetDateTime quandoFoiPostado;
