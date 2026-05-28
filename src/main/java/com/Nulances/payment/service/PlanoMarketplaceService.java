@@ -57,13 +57,18 @@ public class PlanoMarketplaceService {
     }
 
     public PlanoAnuncio buscarPlanoAtivo(UUID planoId) {
-        PlanoAnuncio plano = planoAnuncioRepository.findById(planoId)
-                .orElseThrow(() -> new IllegalArgumentException("Plano não encontrado."));
-
+        PlanoAnuncio plano = buscarPlanoPorId(planoId);
         if (!Boolean.TRUE.equals(plano.getAtivo())) {
             throw new IllegalArgumentException("Plano selecionado está inativo.");
         }
         return plano;
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public PlanoAnuncio buscarPlanoPorId(UUID planoId) {
+        return planoAnuncioRepository.findById(planoId)
+                .orElseThrow(() -> new IllegalArgumentException("Plano não encontrado."));
     }
 
     private PlanoAnuncioResponse toResponse(PlanoAnuncio plano) {

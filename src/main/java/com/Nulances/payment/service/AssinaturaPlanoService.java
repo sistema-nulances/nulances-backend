@@ -10,6 +10,7 @@ import com.Nulances.domain.enums.StatusAssinaturaPlano;
 import com.Nulances.domain.enums.StatusPagamentoPlano;
 import com.Nulances.domain.enums.TipoPagamentoPlano;
 import com.Nulances.domain.enums.UserRole;
+import com.Nulances.dto.request.AdminAtribuirPlanoVendedorRequest;
 import com.Nulances.dto.request.AssinarPlanoRequest;
 import com.Nulances.dto.response.CheckoutPlanoResponse;
 import com.Nulances.dto.response.MinhaAssinaturaPlanoResponse;
@@ -156,6 +157,44 @@ public class AssinaturaPlanoService {
         assinaturaPlanoRepository.save(assinatura);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
+    public MinhaAssinaturaPlanoResponse buscarAssinaturaVendedorAdmin(UUID vendedorId) {
+        Usuario vendedor = buscarVendedorPorId(vendedorId);
+        return assinaturaPlanoRepository
+                .findFirstByVendedorIdOrderByCreatedAtDesc(vendedor.getId())
+                .map(this::toMinhaAssinaturaResponse)
+                .orElse(null);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public MinhaAssinaturaPlanoResponse atribuirPlanoAdmin(
+            UUID vendedorId,
+            AdminAtribuirPlanoVendedorRequest request
+    ) {
+        Usuario vendedor = buscarVendedorPorId(vendedorId);
+        PlanoAnuncio plano = planoMarketplaceService.buscarPlanoPorId(request.getPlanoId());
+
+        AssinaturaPlano assinatura = assinaturaPlanoRepository
+                .findFirstByVendedorIdOrderByCreatedAtDesc(vendedor.getId())
+                .orElseGet(AssinaturaPlano::new);
+
+        Instant agora = Instant.now();
+        assinatura.setVendedor(vendedor);
+        assinatura.setPlano(plano);
+        assinatura.setStatus(StatusAssinaturaPlano.ATIVA);
+        if (assinatura.getInicioVigencia() == null) {
+            assinatura.setInicioVigencia(agora);
+        }
+        assinatura.setUltimaCobrancaEm(agora);
+        // Cortesia admin: sem cobrança recorrente automática (Mercado Pago).
+        assinatura.setProximaCobranca(null);
+
+        assinatura = assinaturaPlanoRepository.save(assinatura);
+        return toMinhaAssinaturaResponse(assinatura);
+    }
+
     private PagamentoPlano criarPagamento(AssinaturaPlano assinatura, TipoPagamentoPlano tipo) {
         String referencia = "PLANO-" + UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase();
         MercadoPagoCheckoutService.CheckoutPreferenceData checkout = mercadoPagoCheckoutService.criarPreferenciaCheckout(
@@ -204,6 +243,17 @@ public class AssinaturaPlanoService {
                         .ativo(plano.getAtivo())
                         .build())
                 .build();
+    }
+
+    private Usuario buscarVendedorPorId(UUID vendedorId) {
+        Usuario usuario = usuarioRepository.findById(vendedorId)
+                .orElseThrow(() -> new IllegalArgumentException("Vendedor não encontrado."));
+
+        if (usuario.getRole() != UserRole.VENDEDOR && usuario.getRole() != UserRole.ADMIN) {
+            throw new IllegalArgumentException("Usuário informado não possui perfil de vendedor.");
+        }
+
+        return usuario;
     }
 
     private Usuario buscarVendedorAutenticado(CustomUserDetails userDetails) {

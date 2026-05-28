@@ -2,9 +2,12 @@ package com.Nulances.controller.admin;
 
 import com.Nulances.config.security.CustomUserDetails;
 import com.Nulances.domain.enums.StatusContaMarketplaceAdmin;
+import com.Nulances.dto.request.AdminAtribuirPlanoVendedorRequest;
 import com.Nulances.dto.request.RecusarSolicitacaoVendedorRequest;
 import com.Nulances.dto.response.AdminMarketplaceSolicitacaoPendenteDetalheResponse;
 import com.Nulances.dto.response.AdminMarketplaceVendedorListItemResponse;
+import com.Nulances.dto.response.MinhaAssinaturaPlanoResponse;
+import com.Nulances.payment.service.AssinaturaPlanoService;
 import com.Nulances.service.AdminMarketplaceVendedorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ import java.util.UUID;
 public class AdminMarketplaceVendedorController {
 
     private final AdminMarketplaceVendedorService adminMarketplaceVendedorService;
+    private final AssinaturaPlanoService assinaturaPlanoService;
 
     @GetMapping
     public List<AdminMarketplaceVendedorListItemResponse> listar(
@@ -59,5 +63,18 @@ public class AdminMarketplaceVendedorController {
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
         adminMarketplaceVendedorService.revogarVendedor(usuarioId, userDetails);
+    }
+
+    @GetMapping("/{usuarioId}/assinatura")
+    public MinhaAssinaturaPlanoResponse buscarAssinatura(@PathVariable UUID usuarioId) {
+        return assinaturaPlanoService.buscarAssinaturaVendedorAdmin(usuarioId);
+    }
+
+    @PatchMapping("/{usuarioId}/assinatura")
+    public MinhaAssinaturaPlanoResponse atribuirPlano(
+            @PathVariable UUID usuarioId,
+            @Valid @RequestBody AdminAtribuirPlanoVendedorRequest request
+    ) {
+        return assinaturaPlanoService.atribuirPlanoAdmin(usuarioId, request);
     }
 }
