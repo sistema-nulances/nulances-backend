@@ -63,4 +63,6 @@ public interface LeilaoLoteBemRepository extends JpaRepository<LeilaoLoteBem, UU
     List<LeilaoLoteBem> findByStatusAndAberturaDisputaLessThanEqual(StatusItemLeilao status, Instant now);
 
     List<LeilaoLoteBem> findByStatusAndEncerramentoDisputaLessThanEqual(StatusItemLeilao status, Instant now);
+
+    List<LeilaoLoteBem> findByLeilaoLoteId(UUID leilaoLoteId);
 }

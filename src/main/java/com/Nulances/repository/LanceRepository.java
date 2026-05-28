@@ -35,6 +35,8 @@ public interface LanceRepository extends JpaRepository<Lance, UUID> {
 
     Optional<Lance> findTopByLeilaoLoteBemIdOrderByCreatedAtDesc(UUID leilaoLoteBemId);
 
+    void deleteByLeilaoLoteBemId(UUID leilaoLoteBemId);
+
     @Query("""
         select l from Lance l
         join fetch l.usuario u

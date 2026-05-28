@@ -12,6 +12,7 @@ import com.Nulances.domain.entity.Usuario;
 import com.Nulances.domain.enums.FormatoLeilao;
 import com.Nulances.domain.enums.StatusItemLeilao;
 import com.Nulances.domain.enums.StatusLeilao;
+import com.Nulances.domain.enums.StatusBem;
 import com.Nulances.domain.enums.StatusLote;
 import com.Nulances.dto.request.LeilaoCreateRequest;
 import com.Nulances.dto.response.LeilaoCardResponse;
@@ -190,6 +191,37 @@ public class LeilaoService {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    public void excluir(UUID id) {
+        Leilao leilao = leilaoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Leilão não encontrado."));
+
+        List<LeilaoLote> leilaoLotes = leilaoLoteRepository.findByLeilaoId(id);
+
+        for (LeilaoLote ll : leilaoLotes) {
+            List<LeilaoLoteBem> llBens = leilaoLoteBemRepository.findByLeilaoLoteId(ll.getId());
+
+            for (LeilaoLoteBem llb : llBens) {
+                lanceRepository.deleteByLeilaoLoteBemId(llb.getId());
+                Bem bem = llb.getBem();
+                if (bem != null && bem.getStatus() != StatusBem.ARREMATADO) {
+                    bem.setStatus(StatusBem.DISPONIVEL);
+                    bemRepository.save(bem);
+                }
+            }
+            leilaoLoteBemRepository.deleteAll(llBens);
+
+            Lote lote = ll.getLote();
+            if (lote != null) {
+                lote.setStatus(StatusLote.DISPONIVEL);
+                loteRepository.save(lote);
+            }
+        }
+
+        leilaoLoteRepository.deleteAll(leilaoLotes);
+        leilaoRepository.delete(leilao);
+    }
+
     @Transactional(readOnly = true)
     public LeilaoResponse buscarPorIdAdmin(UUID id) {
         Leilao leilao = leilaoRepository.findDetailedById(id)

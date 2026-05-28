@@ -102,13 +102,13 @@ public class LoteService {
     public void excluir(UUID id) {
         Lote lote = buscarLotePorId(id);
 
-        validarPodeEditarOuExcluir(lote);
-
         List<Bem> bens = lote.getBens() == null ? List.of() : new ArrayList<>(lote.getBens());
 
         for (Bem bem : bens) {
             bem.setLote(null);
-            bem.setStatus(StatusBem.DISPONIVEL);
+            if (bem.getStatus() != StatusBem.ARREMATADO) {
+                bem.setStatus(StatusBem.DISPONIVEL);
+            }
         }
 
         if (!bens.isEmpty()) {

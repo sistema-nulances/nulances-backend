@@ -41,6 +41,12 @@ public class AdminLeilaoController {
         return leilaoService.listarCardsPlataforma();
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void excluir(@PathVariable UUID id) {
+        leilaoService.excluir(id);
+    }
+
     @GetMapping("/{id}/painel")
     public LeilaoPainelResponse buscarPainel(@PathVariable UUID id) {
         return leilaoService.buscarPainel(id);

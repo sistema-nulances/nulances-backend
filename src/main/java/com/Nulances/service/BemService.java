@@ -105,9 +105,6 @@ public class BemService {
     @Transactional
     public void excluir(UUID id) {
         Bem bem = buscarBem(id);
-
-        validarPodeEditarOuExcluir(bem);
-
         bemMidiaRepository.deleteByBemId(bem.getId());
         bemRepository.delete(bem);
     }
