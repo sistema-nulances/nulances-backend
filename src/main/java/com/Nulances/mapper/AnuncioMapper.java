@@ -124,6 +124,7 @@ public class AnuncioMapper {
                 .id(anuncio.getId())
                 .categoria(anuncio.getCategoria())
                 .modelo(anuncio.getModelo())
+                .descricao(anuncio.getDescricao())
                 .marcaVeiculo(anuncio.getMarca() != null ? anuncio.getMarca().getNome() : null)
                 .preco(anuncio.getPreco())
                 .cidade(anuncio.getCidade())

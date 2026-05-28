@@ -22,6 +22,7 @@ public class AnuncioPublicoListResponse {
     private UUID id;
     private CategoriaAnuncio categoria;
     private String modelo;
+    private String descricao;
     private MarcaVeiculo marcaVeiculo;
     private BigDecimal preco;
     private String cidade;
