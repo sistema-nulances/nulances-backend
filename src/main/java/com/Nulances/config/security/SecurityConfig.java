@@ -74,8 +74,6 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Em apps mobile (Expo/React Native) normalmente não há CORS como no browser,
-        // mas o web (localhost/LAN) precisa estar liberado durante desenvolvimento.
         configuration.setAllowedOriginPatterns(List.of(
                 "http://localhost:*",
                 "http://127.0.0.1:*",
