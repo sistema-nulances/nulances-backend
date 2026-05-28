@@ -526,6 +526,6 @@ public class AnuncioService {
     }
 
     private boolean isCategoriaVeiculo(CategoriaAnuncio categoria) {
-        return categoria == null;
+        return categoria == CategoriaAnuncio.VEICULOS;
     }
 }
