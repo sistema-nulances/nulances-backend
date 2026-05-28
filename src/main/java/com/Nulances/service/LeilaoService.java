@@ -202,6 +202,9 @@ public class LeilaoService {
             List<LeilaoLoteBem> llBens = leilaoLoteBemRepository.findByLeilaoLoteId(ll.getId());
 
             for (LeilaoLoteBem llb : llBens) {
+                // Nulo o maiorLance antes para evitar FK circular ao deletar lances
+                llb.setMaiorLance(null);
+                leilaoLoteBemRepository.save(llb);
                 lanceRepository.deleteByLeilaoLoteBemId(llb.getId());
                 Bem bem = llb.getBem();
                 if (bem != null && bem.getStatus() != StatusBem.ARREMATADO) {

@@ -14,6 +14,8 @@ public interface LeilaoLoteRepository extends JpaRepository<LeilaoLote, UUID> {
 
     List<LeilaoLote> findByLeilaoId(UUID leilaoId);
 
+    List<LeilaoLote> findByLoteId(UUID loteId);
+
     @Query("""
     select distinct ll
     from LeilaoLote ll

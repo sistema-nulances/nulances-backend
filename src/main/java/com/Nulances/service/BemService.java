@@ -2,6 +2,7 @@ package com.Nulances.service;
 
 import com.Nulances.domain.entity.Bem;
 import com.Nulances.domain.entity.BemMidia;
+import com.Nulances.domain.entity.LeilaoLoteBem;
 import com.Nulances.domain.entity.Marca;
 import com.Nulances.domain.enums.MarcaVeiculo;
 import com.Nulances.domain.enums.StatusBem;
@@ -14,6 +15,8 @@ import com.Nulances.mapper.BemMapper;
 import com.Nulances.mapper.BemMidiaMapper;
 import com.Nulances.repository.BemMidiaRepository;
 import com.Nulances.repository.BemRepository;
+import com.Nulances.repository.LanceRepository;
+import com.Nulances.repository.LeilaoLoteBemRepository;
 import com.Nulances.repository.MarcaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,6 +39,8 @@ public class BemService {
     private final BemRepository bemRepository;
     private final BemMidiaRepository bemMidiaRepository;
     private final MarcaRepository marcaRepository;
+    private final LeilaoLoteBemRepository leilaoLoteBemRepository;
+    private final LanceRepository lanceRepository;
     private final BemMapper bemMapper;
     private final BemMidiaMapper bemMidiaMapper;
 
@@ -105,7 +110,19 @@ public class BemService {
     @Transactional
     public void excluir(UUID id) {
         Bem bem = buscarBem(id);
+
+        // Cascateia a exclusão dos LeilaoLoteBem que referenciam este bem
+        var llBens = leilaoLoteBemRepository.findByBemId(bem.getId());
+        for (var llb : llBens) {
+            llb.setMaiorLance(null);
+            leilaoLoteBemRepository.save(llb);
+            lanceRepository.deleteByLeilaoLoteBemId(llb.getId());
+        }
+        leilaoLoteBemRepository.deleteAll(llBens);
+
         bemMidiaRepository.deleteByBemId(bem.getId());
+        bem.setLote(null);
+        bemRepository.save(bem);
         bemRepository.delete(bem);
     }
 

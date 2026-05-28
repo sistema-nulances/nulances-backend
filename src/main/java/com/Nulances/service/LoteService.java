@@ -1,6 +1,8 @@
 package com.Nulances.service;
 
 import com.Nulances.domain.entity.Bem;
+import com.Nulances.domain.entity.LeilaoLote;
+import com.Nulances.domain.entity.LeilaoLoteBem;
 import com.Nulances.domain.entity.Lote;
 import com.Nulances.domain.enums.StatusBem;
 import com.Nulances.domain.enums.StatusLote;
@@ -12,6 +14,9 @@ import com.Nulances.dto.response.LoteStatsResponse;
 import com.Nulances.helpers.LoteCodigoGenerator;
 import com.Nulances.mapper.LoteMapper;
 import com.Nulances.repository.BemRepository;
+import com.Nulances.repository.LanceRepository;
+import com.Nulances.repository.LeilaoLoteBemRepository;
+import com.Nulances.repository.LeilaoLoteRepository;
 import com.Nulances.repository.LoteRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +34,9 @@ public class LoteService {
 
     private final LoteRepository loteRepository;
     private final BemRepository bemRepository;
+    private final LeilaoLoteRepository leilaoLoteRepository;
+    private final LeilaoLoteBemRepository leilaoLoteBemRepository;
+    private final LanceRepository lanceRepository;
     private final LoteCodigoGenerator loteCodigoGenerator;
     private final LoteMapper loteMapper;
 
@@ -102,15 +110,26 @@ public class LoteService {
     public void excluir(UUID id) {
         Lote lote = buscarLotePorId(id);
 
-        List<Bem> bens = lote.getBens() == null ? List.of() : new ArrayList<>(lote.getBens());
+        // Cascateia a exclusão dos LeilaoLote que referenciam este lote
+        var leilaoLotes = leilaoLoteRepository.findByLoteId(id);
+        for (var ll : leilaoLotes) {
+            var llBens = leilaoLoteBemRepository.findByLeilaoLoteId(ll.getId());
+            for (var llb : llBens) {
+                llb.setMaiorLance(null);
+                leilaoLoteBemRepository.save(llb);
+                lanceRepository.deleteByLeilaoLoteBemId(llb.getId());
+            }
+            leilaoLoteBemRepository.deleteAll(llBens);
+        }
+        leilaoLoteRepository.deleteAll(leilaoLotes);
 
+        List<Bem> bens = lote.getBens() == null ? List.of() : new ArrayList<>(lote.getBens());
         for (Bem bem : bens) {
             bem.setLote(null);
             if (bem.getStatus() != StatusBem.ARREMATADO) {
                 bem.setStatus(StatusBem.DISPONIVEL);
             }
         }
-
         if (!bens.isEmpty()) {
             bemRepository.saveAll(bens);
         }
