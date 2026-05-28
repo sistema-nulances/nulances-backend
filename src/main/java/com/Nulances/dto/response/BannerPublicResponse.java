@@ -14,4 +14,5 @@ public class BannerPublicResponse {
     private Integer posicao;
     private String textoAlternativo;
     private String imagem;
+    private String objectPosition;
 }

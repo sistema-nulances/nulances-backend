@@ -17,6 +17,7 @@ public class BannerAdminResponse {
     private String imagem;
     private String arquivoUrl;
     private Boolean ativo;
+    private String objectPosition;
     private Instant createdAt;
     private Instant updatedAt;
 }

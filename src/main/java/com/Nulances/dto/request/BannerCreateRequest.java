@@ -22,4 +22,6 @@ public class BannerCreateRequest {
     private String imagem;
 
     private Boolean ativo = true;
+
+    private String objectPosition;
 }

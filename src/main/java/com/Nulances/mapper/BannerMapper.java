@@ -16,6 +16,7 @@ public class BannerMapper {
         banner.setTextoAlternativo(normalizarOpcional(request.getTextoAlternativo()));
         banner.setImagem(request.getImagem().trim());
         banner.setAtivo(request.getAtivo() != null ? request.getAtivo() : true);
+        banner.setObjectPosition(normalizarOpcional(request.getObjectPosition()));
         return banner;
     }
 
@@ -26,6 +27,7 @@ public class BannerMapper {
         response.setPosicao(banner.getPosicao());
         response.setTextoAlternativo(banner.getTextoAlternativo());
         response.setImagem(banner.getImagem());
+        response.setObjectPosition(banner.getObjectPosition());
         return response;
     }
 
@@ -38,6 +40,7 @@ public class BannerMapper {
         response.setImagem(banner.getImagem());
         response.setArquivoUrl(arquivoUrl);
         response.setAtivo(banner.getAtivo());
+        response.setObjectPosition(banner.getObjectPosition());
         response.setCreatedAt(banner.getCreatedAt());
         response.setUpdatedAt(banner.getUpdatedAt());
         return response;

@@ -26,4 +26,8 @@ public class Banner extends AuditableEntity {
 
     @Column(nullable = false)
     private Boolean ativo = true;
+
+    /** Ponto focal da imagem em formato CSS: ex. "50% 30%". Nulo = "50% 50%" (centro). */
+    @Column(name = "object_position", length = 20)
+    private String objectPosition;
 }

@@ -13,4 +13,6 @@ public class BannerUpdateRequest {
     private String textoAlternativo;
     private String imagem;
     private Boolean ativo;
+
+    private String objectPosition;
 }

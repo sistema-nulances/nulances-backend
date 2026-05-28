@@ -130,6 +130,10 @@ public class BannerService {
             banner.setAtivo(request.getAtivo());
         }
 
+        if (request.getObjectPosition() != null) {
+            banner.setObjectPosition(normalizarOpcional(request.getObjectPosition()));
+        }
+
         Banner atualizado = bannerRepository.save(banner);
 
         return bannerMapper.toAdminResponse(atualizado, gerarArquivoUrl(atualizado.getImagem()));
