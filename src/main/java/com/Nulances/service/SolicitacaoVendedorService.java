@@ -146,32 +146,31 @@ public class SolicitacaoVendedorService {
         List<DocumentoSolicitacaoVendedor> docs = new ArrayList<>();
 
         if (r.getTipoPessoa() == TipoPessoaVendedor.PESSOA_FISICA) {
-            docs.add(doc(s, TipoDocumentoSolicitacaoVendedor.RG_FRENTE, r.getRgFrenteKey()));
-            docs.add(doc(s, TipoDocumentoSolicitacaoVendedor.RG_VERSO, r.getRgVersoKey()));
-            docs.add(doc(s, TipoDocumentoSolicitacaoVendedor.CPF_FRENTE, r.getCpfFrenteKey()));
-            docs.add(doc(s, TipoDocumentoSolicitacaoVendedor.CPF_VERSO, r.getCpfVersoKey()));
+            docOpcional(s, TipoDocumentoSolicitacaoVendedor.RG_FRENTE, r.getRgFrenteKey()).ifPresent(docs::add);
+            docOpcional(s, TipoDocumentoSolicitacaoVendedor.RG_VERSO, r.getRgVersoKey()).ifPresent(docs::add);
+            docOpcional(s, TipoDocumentoSolicitacaoVendedor.CPF_FRENTE, r.getCpfFrenteKey()).ifPresent(docs::add);
+            docOpcional(s, TipoDocumentoSolicitacaoVendedor.CPF_VERSO, r.getCpfVersoKey()).ifPresent(docs::add);
         } else {
-            docs.add(doc(s, TipoDocumentoSolicitacaoVendedor.SELFIE_COM_DOCUMENTO, r.getSelfieComDocumentoKey()));
-            docs.add(doc(s, TipoDocumentoSolicitacaoVendedor.CONTRATO_SOCIAL, r.getContratoSocialKey()));
+            docOpcional(s, TipoDocumentoSolicitacaoVendedor.SELFIE_COM_DOCUMENTO, r.getSelfieComDocumentoKey()).ifPresent(docs::add);
+            docOpcional(s, TipoDocumentoSolicitacaoVendedor.CONTRATO_SOCIAL, r.getContratoSocialKey()).ifPresent(docs::add);
         }
 
         s.getDocumentos().addAll(docs);
     }
 
-    private DocumentoSolicitacaoVendedor doc(
+    private java.util.Optional<DocumentoSolicitacaoVendedor> docOpcional(
             SolicitacaoVendedor s,
             TipoDocumentoSolicitacaoVendedor tipo,
             String key
     ) {
         if (key == null || key.isBlank()) {
-            throw new IllegalArgumentException("Documento obrigatório.");
+            return java.util.Optional.empty();
         }
-
         DocumentoSolicitacaoVendedor d = new DocumentoSolicitacaoVendedor();
         d.setSolicitacao(s);
         d.setTipo(tipo);
         d.setArquivo(trim(key));
-        return d;
+        return java.util.Optional.of(d);
     }
 
     private void validar(SolicitarAcessoVendedorRequest r) {
