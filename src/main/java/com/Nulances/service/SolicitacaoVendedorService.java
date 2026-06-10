@@ -29,7 +29,6 @@ public class SolicitacaoVendedorService {
     private final UsuarioRepository usuarioRepository;
     private final SolicitacaoVendedorMapper mapper;
 
-    @PreAuthorize("hasRole('COMUM')")
     @Transactional
     public SolicitacaoVendedorResponse solicitar(Usuario usuario, SolicitarAcessoVendedorRequest request) {
         validarPermissaoSolicitacao(usuario);
@@ -38,8 +37,13 @@ public class SolicitacaoVendedorService {
         SolicitacaoVendedor solicitacao = repository.findByUsuario_Id(usuario.getId())
                 .orElseGet(SolicitacaoVendedor::new);
 
-        if (solicitacao.getId() != null && solicitacao.getStatus() == StatusSolicitacaoVendedor.PENDENTE) {
-            throw new IllegalArgumentException("Já existe uma solicitação pendente.");
+        if (solicitacao.getId() != null) {
+            if (solicitacao.getStatus() == StatusSolicitacaoVendedor.PENDENTE) {
+                throw new IllegalArgumentException("Já existe uma solicitação pendente.");
+            }
+            if (solicitacao.getStatus() == StatusSolicitacaoVendedor.APROVADA) {
+                throw new IllegalArgumentException("Sua solicitação já foi aprovada. Acesse o painel do vendedor.");
+            }
         }
 
         solicitacao.setUsuario(usuario);
@@ -137,6 +141,9 @@ public class SolicitacaoVendedorService {
     }
 
     private void validarPermissaoSolicitacao(Usuario usuario) {
+        if (usuario.getRole() == UserRole.VENDEDOR) {
+            throw new IllegalArgumentException("Você já é vendedor e possui acesso ao painel.");
+        }
         if (usuario.getRole() != UserRole.COMUM) {
             throw new IllegalArgumentException("Somente usuários com perfil COMUM podem solicitar acesso para vendedor.");
         }

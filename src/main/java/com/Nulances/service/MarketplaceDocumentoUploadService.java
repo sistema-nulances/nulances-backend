@@ -7,7 +7,6 @@ import com.Nulances.dto.response.UploadDocumentoVendedorResponse;
 import com.Nulances.storage.R2Properties;
 import com.Nulances.storage.R2Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,9 +22,11 @@ public class MarketplaceDocumentoUploadService {
     private final R2Service r2Service;
     private final R2Properties r2Properties;
 
-    @PreAuthorize("hasRole('COMUM')")
     @Transactional(readOnly = true)
     public UploadDocumentoVendedorResponse gerarUpload(Usuario usuario, GerarUploadDocumentoVendedorRequest request) {
+        if (usuario.getRole() == UserRole.VENDEDOR) {
+            throw new IllegalArgumentException("Você já é vendedor e não precisa enviar documentos de solicitação.");
+        }
         if (usuario.getRole() != UserRole.COMUM) {
             throw new IllegalArgumentException("Somente usuários com perfil COMUM podem enviar documentos para solicitação de vendedor.");
         }
